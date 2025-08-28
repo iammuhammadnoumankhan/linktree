@@ -146,6 +146,15 @@
         body[data-theme="rain"] { background: linear-gradient(#37474f, #263238); }
         body[data-theme="cloudy"] { background: linear-gradient(#cfd8dc, #90a4ae); }
 
+        /* Popup responsive fixes */
+        #themeMenu {
+        min-width: 8rem;
+        }
+        #themeMenu button {
+        text-align: left;
+        font-size: 0.9rem;
+}
+
     </style>
 </head>
 <body class="text-white">
@@ -160,15 +169,23 @@
     <div class="constellation-layer layer-3"></div>
 
     <!-- 🌗 Theme Toggle -->
+    <!-- Theme Toggle (Compact) -->
     <div class="fixed top-4 right-4 z-50">
-        <select id="themeToggle"
-                class="p-2 bg-black/40 text-white rounded-lg backdrop-blur-sm">
-            <option value="default">🌑 Default</option>
-            <option value="auto">🌦 Auto (Weather/Time)</option>
-            <option value="light">☀️ Light</option>
-            <option value="dark">🌙 Dark</option>
-        </select>
+    <button id="themeBtn"
+            class="p-2 bg-black/30 hover:bg-black/50 backdrop-blur-md rounded-full text-white shadow-lg transition">
+        <i class="fas fa-adjust"></i>
+    </button>
+
+    <!-- Popup Menu -->
+    <div id="themeMenu"
+        class="hidden absolute right-0 mt-2 w-40 bg-black/80 text-white rounded-lg shadow-xl text-sm">
+        <button data-theme="default" class="block w-full px-3 py-2 hover:bg-red-500/40">🌑 Default</button>
+        <button data-theme="auto" class="block w-full px-3 py-2 hover:bg-red-500/40">🌦 Auto</button>
+        <button data-theme="light" class="block w-full px-3 py-2 hover:bg-red-500/40">☀️ Light</button>
+        <button data-theme="dark" class="block w-full px-3 py-2 hover:bg-red-500/40">🌙 Dark</button>
     </div>
+    </div>
+
 
     <!-- Main Container -->
     <div class="relative z-10 container mx-auto px-4 py-8 max-w-2xl">
@@ -832,9 +849,15 @@
 
     <!-- Auto Theme Mode -->
     <script>
-        const select = document.getElementById("themeToggle");
         const body = document.body;
+        const btn = document.getElementById("themeBtn");
+        const menu = document.getElementById("themeMenu");
 
+        btn.addEventListener("click", () => {
+        menu.classList.toggle("hidden");
+        });
+
+        // Apply Auto theme (time + weather)
         async function applyAutoTheme() {
         const hour = new Date().getHours();
         let theme = "day";
@@ -853,22 +876,31 @@
         body.dataset.theme = theme;
         }
 
-        select.addEventListener("change", async (e) => {
-        const value = e.target.value;
+        // Handle clicks in menu
+        menu.querySelectorAll("button").forEach(btn => {
+        btn.addEventListener("click", async () => {
+            menu.classList.add("hidden");
+            const value = btn.dataset.theme;
 
-        if (value === "default") {
-            body.dataset.theme = ""; // restore your normal dark theme
-        } else if (value === "auto") {
+            if (value === "default") {
+            body.dataset.theme = ""; // restore default dark
+            body.style.background = "";
+            body.style.color = "";
+            } else if (value === "auto") {
             await applyAutoTheme();
-        } else if (value === "light") {
+            } else if (value === "light") {
+            body.dataset.theme = "";
             body.style.background = "#fefefe";
             body.style.color = "#111";
-        } else if (value === "dark") {
+            } else if (value === "dark") {
+            body.dataset.theme = "";
             body.style.background = "#000";
             body.style.color = "#fff";
-        }
+            }
+        });
         });
     </script>
+
 
     <!-- Background Quotes Generator -->
     <script>
