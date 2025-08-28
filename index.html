@@ -215,6 +215,22 @@
             </div>
         </div>
 
+        <section class="mb-8">
+            <h2 class="text-xl font-semibold mb-4 text-center section-title">
+                <i class="fab fa-github mr-2"></i>GitHub Pulse
+            </h2>
+            <div id="gh-card"
+                class="link-item p-4 rounded-lg flex items-center gap-4">
+                <img id="gh-avatar" class="w-12 h-12 rounded-full" src="" alt="">
+                <div>
+                <div id="gh-name" class="font-bold"></div>
+                <div id="gh-followers" class="text-sm text-gray-300"></div>
+                <div id="gh-stars" class="text-sm text-gray-300"></div>
+                </div>
+                <img id="gh-chart" class="h-10 ml-auto" src="" alt="">
+            </div>
+        </section>
+
         <!-- Extras Section -->
         <div class="mb-8">
             <h2 class="text-xl font-semibold mb-4 text-center section-title">
@@ -465,6 +481,21 @@
         if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/linktree/sw.js');
         }
+    </script>
+
+    <script>
+        (async () => {
+        const user = 'iammuhammadnoumankhan';
+        const res = await fetch(`https://api.github.com/users/${user}`);
+        const data = await res.json();
+        document.getElementById('gh-avatar').src = data.avatar_url;
+        document.getElementById('gh-name').textContent = data.name || user;
+        document.getElementById('gh-followers').textContent = `👥 ${data.followers} followers`;
+        document.getElementById('gh-stars').textContent = `⭐ ${data.public_repos} repos`;
+        // green contribution graph
+        document.getElementById('gh-chart').src =
+            `https://ghchart.rshah.org/${user}.png`;
+        })();
     </script>
 </body>
 </html>
