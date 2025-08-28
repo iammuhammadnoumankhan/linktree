@@ -110,6 +110,12 @@
         <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-red-600 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse animation-delay-2000"></div>
     </div> -->
 
+    <!-- 🌗 Theme Toggle -->
+    <button id="themeToggle"
+            title="Toggle dark/light"
+            class="fixed top-4 right-4 z-50 p-2 bg-black/20 hover:bg-black/40 backdrop-blur-sm rounded-full transition">
+    <i id="themeIcon" class="fas fa-moon text-lg"></i>
+    </button>
     <!-- Main Container -->
     <div class="relative z-10 container mx-auto px-4 py-8 max-w-2xl">
         <!-- Profile Section -->
@@ -224,6 +230,25 @@
                     <span class="ml-3 font-medium">noumankhanonai@gmail.com</span>
                     <i class="fas fa-copy ml-auto text-gray-400 text-sm hover:text-white cursor-pointer" onclick="copyEmail()"></i>
                 </a>
+
+                <a href="#!" id="vcardBtn"
+                    class="link-item flex items-center p-4 rounded-lg">
+                    <i class="fas fa-id-card text-cyan-400 text-xl w-8"></i>
+                    <span class="ml-3 font-medium">Save my contact</span>
+                    <i class="fas fa-qrcode ml-auto text-gray-400 text-sm"></i>
+                </a>
+
+                <!-- Modal -->
+                <div id="qrModal"
+                    class="fixed inset-0 bg-black/70 backdrop-blur hidden items-center justify-center z-50">
+                <div class="relative w-72 h-72">
+                    <canvas id="qrCanvas" class="w-full h-full rounded-xl shadow-2xl"></canvas>
+                    <button onclick="qrModal.classList.add('hidden')"
+                            class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-8 h-8">
+                    <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                </div>
                 
                 <!-- <a href="https://buymeacoffee.com/yourhandle" target="_blank" class="link-item flex items-center p-4 rounded-lg">
                     <i class="fas fa-coffee text-yellow-400 text-xl w-8"></i>
@@ -357,5 +382,87 @@
 
     <!-- Particle Network -->
     <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.9.3/tsparticles.bundle.min.js"></script>
+
+    <script>
+        (() => {
+        const html = document.documentElement;
+        const icon  = document.getElementById('themeIcon');
+        const btn   = document.getElementById('themeToggle');
+
+        const setTheme = (mode = 'auto') => {
+            const root = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            const chosen = mode === 'auto' ? root : mode;
+            html.classList.toggle('dark', chosen === 'dark');
+            icon.className = chosen === 'dark' ? 'fas fa-sun text-lg' : 'fas fa-moon text-lg';
+            if (mode !== 'auto') localStorage.setItem('theme', mode);
+        };
+
+        // initial
+        setTheme(localStorage.getItem('theme') || 'auto');
+
+        // click toggles light ↔ dark
+        btn.addEventListener('click', () => {
+            const current = html.classList.contains('dark') ? 'light' : 'dark';
+            setTheme(current);
+        });
+
+        // auto-switch if system changes
+        window.matchMedia('(prefers-color-scheme: dark)')
+                .addEventListener('change', () => {
+                if (!localStorage.getItem('theme')) setTheme('auto');
+                });
+        })();
+    </script>
+
+    <style>
+        /* Dark overrides */
+        html.dark {
+            --bg: #000000;
+            --glass: rgba(0, 0, 0, 0.45);
+        }
+        /* smooth color transition */
+        html, body { transition: background 0.3s, color 0.3s; }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+    <script>
+        const vCard = `BEGIN:VCARD
+        VERSION:3.0
+        FN:Muhammad Nouman Khan
+        ORG:PAF-IAST
+        TITLE:AI & MLOps Engineer | IEEE-Published
+        EMAIL:noumankhanonai@gmail.com
+        URL:https://iammuhammadnoumankhan.github.io/linktree/
+        END:VCARD`;
+
+        const qrModal = document.getElementById('qrModal');
+        const qrCanvas = document.getElementById('qrCanvas');
+
+        // generate & show
+        document.getElementById('vcardBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        QRCode.toCanvas(qrCanvas, vCard, { width: 256, margin: 2 }, () => {
+            qrModal.classList.remove('hidden');
+            // auto-download
+            const blob = new Blob([vCard], { type: 'text/vcard' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = 'Muhammad_Nouman_Khan.vcf'; a.click();
+            URL.revokeObjectURL(url);
+        });
+        });
+    </script>
+
+    <style>
+        #qrCanvas { animation: rotateY 6s linear infinite; }
+        @keyframes rotateY { from { transform: perspective(800px) rotateY(0deg); }
+                            to   { transform: perspective(800px) rotateY(360deg); } }
+    </style>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/linktree/sw.js');
+        }
+    </script>
 </body>
 </html>
