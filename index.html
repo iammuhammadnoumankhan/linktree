@@ -103,6 +103,18 @@
         letter-spacing: 0.05em;
         font-variant-numeric: tabular-nums;
         }
+
+        /* 🌌 PARALLAX CONSTELLATION */
+        .constellation-layer {
+        position:fixed;
+        top:0; left:0; width:100%; height:100%;
+        pointer-events:none; z-index:-1;
+        transform-style:preserve-3d;
+        }
+        .layer-1{transform:translateZ(-2px) scale(1.2);}
+        .layer-2{transform:translateZ(-1px) scale(1.1);}
+        .layer-3{transform:translateZ(0)   scale(1);}
+
     </style>
 </head>
 <body class="text-white">
@@ -111,6 +123,10 @@
         <div class="absolute -top-40 -right-40 w-80 h-80 bg-red-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
         <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-red-600 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse animation-delay-2000"></div>
     </div> -->
+
+    <div class="constellation-layer layer-1"></div>
+    <div class="constellation-layer layer-2"></div>
+    <div class="constellation-layer layer-3"></div>
 
     <!-- 🌗 Theme Toggle -->
     <button id="themeToggle"
@@ -496,6 +512,91 @@
         document.getElementById('gh-chart').src =
             `https://ghchart.rshah.org/${user}.png`;
         })();
+    </script>
+
+    <!-- 🖥️ RETRO TERMINAL -->
+    <script>
+        document.addEventListener('keydown', e => {
+        if (e.key === '~') {
+            document.body.classList.toggle('retro');
+            // turn links into typed commands
+            $$('.link-item').forEach(el=>el.dataset.text = el.textContent.trim());
+        }
+        });
+    </script>
+
+    <style>
+        .retro{
+        background:#000!important;
+        color:#00ff00!important;
+        font-family: 'Courier New', monospace!important;
+        filter:contrast(1.2) brightness(1.1);
+        }
+        .retro .link-item{
+        background:transparent;
+        border:none;
+        color:#00ff00;
+        position:relative;
+        overflow:hidden;
+        }
+        .retro .link-item::before{
+        content:attr(data-text);
+        width:0;
+        white-space:nowrap;
+        overflow:hidden;
+        animation: type 1.5s steps(40,end) forwards;
+        }
+        @keyframes type{to{width:100%;}}
+    </style>
+
+    <!-- 🧪 MATRIX RAIN -->
+    <script>
+        const KONAMI = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','KeyB','KeyA'];
+        let konamiIdx = 0; // Renamed idx to konamiIdx to avoid redeclaration
+        document.addEventListener('keydown', e => {
+        if (e.code === KONAMI[konamiIdx]) konamiIdx++; else konamiIdx = 0;
+        if (konamiIdx === KONAMI.length) matrixRain();
+        });
+
+        function matrixRain(){
+        const cvs = document.createElement('canvas');
+        const ctx = cvs.getContext('2d');
+        cvs.className = 'fixed inset-0 z-[9999] pointer-events-none';
+        document.body.appendChild(cvs);
+        const W = innerWidth, H = innerHeight;
+        cvs.width=W; cvs.height=H;
+        const cols = Math.floor(W/20);
+        const drops = Array(cols).fill(1);
+        const chars = '01'.split('');
+        function draw(){
+            ctx.fillStyle='rgba(0,0,0,0.05)'; ctx.fillRect(0,0,W,H);
+            ctx.fillStyle='#0f0'; ctx.font='15px monospace';
+            drops.forEach((y,i)=>{
+            const text = chars[Math.floor(Math.random()*chars.length)];
+            ctx.fillText(text, i*20, y*20);
+            if (y*20 > H && Math.random() > 0.975) drops[i]=0;
+            drops[i]++;
+            });
+        }
+        const id = setInterval(draw,50);
+        setTimeout(()=>{clearInterval(id); cvs.remove()},10000);
+        }
+    </script>
+
+        <!-- 🎨 AUTO THEME FROM AVATAR -->
+    <script src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"></script>
+    <script>
+        Vibrant.from('profile.jpeg').getPalette().then(p=>{
+        const accent = p.Vibrant?.hex || '#ef4444';
+        document.documentElement.style.setProperty('--red', accent);
+        });
+    </script>
+
+    <script>
+        window.addEventListener('wheel', e => {
+        const layers = $$('.constellation-layer');
+        layers.forEach((l,i)=>l.style.transform=`translateY(${-e.deltaY*(i+1)*0.2}px)`);
+        });
     </script>
 </body>
 </html>
