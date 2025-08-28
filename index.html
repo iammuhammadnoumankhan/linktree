@@ -139,7 +139,13 @@
         .island:hover { transform: translateY(-6px); box-shadow: 0 18px 48px rgba(0,0,0,0.65); }
         .island .section-title { display:flex; align-items:center; justify-content:center; gap:8px; }
 
-        
+        /* Weather/Time themes */
+        body[data-theme="day"] { background: radial-gradient(ellipse, #e0f7fa, #0288d1); }
+        body[data-theme="morning"] { background: radial-gradient(ellipse, #fff3e0, #f57c00); }
+        body[data-theme="night"] { background: radial-gradient(ellipse, #1a237e, #000); }
+        body[data-theme="rain"] { background: linear-gradient(#37474f, #263238); }
+        body[data-theme="cloudy"] { background: linear-gradient(#cfd8dc, #90a4ae); }
+
     </style>
 </head>
 <body class="text-white">
@@ -154,11 +160,16 @@
     <div class="constellation-layer layer-3"></div>
 
     <!-- 🌗 Theme Toggle -->
-    <button id="themeToggle"
-            title="Toggle dark/light"
-            class="fixed top-4 right-4 z-50 p-2 bg-black/20 hover:bg-black/40 backdrop-blur-sm rounded-full transition">
-    <i id="themeIcon" class="fas fa-moon text-lg"></i>
-    </button>
+    <div class="fixed top-4 right-4 z-50">
+        <select id="themeToggle"
+                class="p-2 bg-black/40 text-white rounded-lg backdrop-blur-sm">
+            <option value="default">🌑 Default</option>
+            <option value="auto">🌦 Auto (Weather/Time)</option>
+            <option value="light">☀️ Light</option>
+            <option value="dark">🌙 Dark</option>
+        </select>
+    </div>
+
     <!-- Main Container -->
     <div class="relative z-10 container mx-auto px-4 py-8 max-w-2xl">
         <!-- Profile Section -->
@@ -170,6 +181,8 @@
             <h1 class="text-3xl font-bold mb-2">MUHAMMAD NOUMAN KHAN</h1>
             <p class="text-gray-300 text-lg">AI & MLOps Engineer & Researcher | IEEE-Published</p>
             <p class="text-gray-400 mt-2">Exploring LLMs, Agents & Generative AI | BSc AI @ PAF-IAST</p>
+
+            <p id="quote" class="text-gray-400 italic text-center mt-3"></p>
         </div>
 
         <!-- Essentials Section -->
@@ -321,6 +334,7 @@
 
         <!-- Footer -->
         <div class="text-center mt-12 pb-8">
+            <p id="visitor-counter" class="text-gray-400 text-sm mt-2"></p>
             <p class="text-gray-400 text-sm">
                 Made with <i class="fas fa-heart text-red-500"></i> by Muhammad Nouman Khan
             </p>
@@ -796,6 +810,80 @@
         })();
     </script>
 
+    <!-- Live Visitor Counter + Country Flags -->
+    <script>
+        (async () => {
+        const counterEl = document.getElementById('visitor-counter');
+        let count = localStorage.getItem('visitCount') || 0;
+        count++;
+        localStorage.setItem('visitCount', count);
+
+        // get country flag
+        let countryFlag = '';
+        try {
+            const res = await fetch('https://ipapi.co/json/');
+            const data = await res.json();
+            countryFlag = data.country_code ? `🇨🇴`.replace('CO', data.country_code) : '';
+        } catch (e) { console.warn('Geo lookup failed'); }
+
+        counterEl.textContent = `👁️ ${count} visits ${countryFlag ? 'from ' + countryFlag : ''}`;
+        })();
+    </script>
+
+    <!-- Auto Theme Mode -->
+    <script>
+        const select = document.getElementById("themeToggle");
+        const body = document.body;
+
+        async function applyAutoTheme() {
+        const hour = new Date().getHours();
+        let theme = "day";
+
+        if (hour >= 19 || hour <= 5) theme = "night";
+        else if (hour >= 6 && hour <= 11) theme = "morning";
+        else theme = "day";
+
+        try {
+            const res = await fetch("https://wttr.in/?format=%C");
+            const weather = await res.text();
+            if (/rain/i.test(weather)) theme = "rain";
+            else if (/cloud/i.test(weather)) theme = "cloudy";
+        } catch {}
+
+        body.dataset.theme = theme;
+        }
+
+        select.addEventListener("change", async (e) => {
+        const value = e.target.value;
+
+        if (value === "default") {
+            body.dataset.theme = ""; // restore your normal dark theme
+        } else if (value === "auto") {
+            await applyAutoTheme();
+        } else if (value === "light") {
+            body.style.background = "#fefefe";
+            body.style.color = "#111";
+        } else if (value === "dark") {
+            body.style.background = "#000";
+            body.style.color = "#fff";
+        }
+        });
+    </script>
+
+    <!-- Background Quotes Generator -->
+    <script>
+        (() => {
+        const quotes = [
+            "AI is not replacing humans — it's augmenting them.",
+            "The future belongs to those who master human + machine intelligence.",
+            "Generative AI is the new electricity.",
+            "LLMs are not just models, they are tools for amplifying thought.",
+            "Trustworthy AI is built on fairness, transparency, and ethics."
+        ];
+        const q = quotes[Math.floor(Math.random() * quotes.length)];
+        document.getElementById('quote').textContent = q;
+        })();
+    </script>
 
 </body>
 </html>
