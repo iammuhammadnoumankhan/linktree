@@ -115,6 +115,31 @@
         .layer-2{transform:translateZ(-1px) scale(1.1);}
         .layer-3{transform:translateZ(0)   scale(1);}
 
+        #profileImg {
+        transform-style: preserve-3d;
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+        will-change: transform;
+        cursor: pointer;
+        }
+
+        #profileImg.tilted {
+        box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+
+        .island {
+        background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+        border: 1px solid rgba(255,255,255,0.04);
+        border-radius: 16px;
+        padding: 14px;
+        margin: 18px 0;
+        box-shadow: 0 10px 30px rgba(3,7,18,0.6);
+        transition: transform .25s ease, box-shadow .25s ease;
+        backdrop-filter: blur(8px) saturate(120%);
+        }
+        .island:hover { transform: translateY(-6px); box-shadow: 0 18px 48px rgba(0,0,0,0.65); }
+        .island .section-title { display:flex; align-items:center; justify-content:center; gap:8px; }
+
+        
     </style>
 </head>
 <body class="text-white">
@@ -139,7 +164,8 @@
         <!-- Profile Section -->
         <div class="text-center mb-8">
             <div class="profile-image mx-auto mb-4">
-                <img src="profile.jpeg" alt="Profile" class="w-32 h-32 rounded-full mx-auto border-4 border-red-500 object-cover glow-effect">
+                <!-- <img src="profile.jpeg" alt="Profile" class="w-32 h-32 rounded-full mx-auto border-4 border-red-500 object-cover glow-effect"> -->
+                <img id="profileImg" src="profile.jpeg" alt="Profile" class="w-32 h-32 rounded-full mx-auto border-4 border-red-500 object-cover glow-effect">
             </div>
             <h1 class="text-3xl font-bold mb-2">MUHAMMAD NOUMAN KHAN</h1>
             <p class="text-gray-300 text-lg">AI & MLOps Engineer & Researcher | IEEE-Published</p>
@@ -147,7 +173,7 @@
         </div>
 
         <!-- Essentials Section -->
-        <div class="mb-8">
+        <div class="island mb-8">
             <h2 class="text-xl font-semibold mb-4 text-center section-title">
                 <i class="fas fa-star mr-2"></i>Essentials
             </h2>
@@ -173,7 +199,7 @@
         </div>
 
         <!-- Social Media Section -->
-        <div class="mb-8">
+        <div class="island mb-8">
             <h2 class="text-xl font-semibold mb-4 text-center section-title">
                 <i class="fas fa-users mr-2"></i>Social Media & Community
             </h2>
@@ -206,7 +232,7 @@
         </div>
 
         <!-- Content & Work Section -->
-        <div class="mb-8">
+        <div class="island mb-8">
             <h2 class="text-xl font-semibold mb-4 text-center section-title">
                 <i class="fas fa-pen-nib mr-2"></i>Content & Work
             </h2>
@@ -231,7 +257,8 @@
             </div>
         </div>
 
-        <section class="mb-8">
+        <!-- Github Pulses -->
+        <section class="island mb-8">
             <h2 class="text-xl font-semibold mb-4 text-center section-title">
                 <i class="fab fa-github mr-2"></i>GitHub Pulse
             </h2>
@@ -248,7 +275,7 @@
         </section>
 
         <!-- Extras Section -->
-        <div class="mb-8">
+        <div class="island mb-8">
             <h2 class="text-xl font-semibold mb-4 text-center section-title">
                 <i class="fas fa-gift mr-2"></i>Connect & Support
             </h2>
@@ -525,6 +552,61 @@
         });
     </script>
 
+    <script>
+        (() => {
+        const doc = document;
+        let retroActive = false;
+        const promptDiv = document.createElement('div');
+        promptDiv.style.cssText = 'position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:99999;background:rgba(0,0,0,0.85);border:1px solid rgba(255,255,255,0.06);color:#00ff00;padding:10px 12px;border-radius:8px;font-family:monospace;display:none;';
+        const input = document.createElement('input');
+        input.placeholder = "type command: open github | open email | help";
+        input.style.cssText = 'background:transparent;border:none;outline:none;color:#00ff00;font-family:monospace;width:36ch';
+        promptDiv.appendChild(input);
+        document.body.appendChild(promptDiv);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === '~') {
+            retroActive = !document.body.classList.toggle('retro');
+            // show prompt when retro activated
+            if (document.body.classList.contains('retro')) {
+                promptDiv.style.display = 'flex';
+                setTimeout(()=>input.focus(), 80);
+            } else {
+                promptDiv.style.display = 'none';
+            }
+            }
+        });
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+            const cmd = input.value.trim().toLowerCase();
+            input.value = '';
+            handleCommand(cmd);
+            } else if (e.key === 'Escape') {
+            input.blur();
+            }
+        });
+
+        function handleCommand(cmd) {
+            if (!cmd) return;
+            if (cmd.includes('open github') || cmd === 'github') {
+            window.open('https://github.com/iammuhammadnoumankhan','_self');
+            } else if (cmd.includes('open email') || cmd.includes('email')) {
+            window.location = 'mailto:noumankhanonai@gmail.com';
+            } else if (cmd === 'help') {
+            alert('Commands: open github · open email · open youtube · copy email');
+            } else if (cmd.includes('open youtube')||cmd==='youtube') {
+            window.open('https://www.youtube.com/@NoumanKhanonAI','_self');
+            } else if (cmd.includes('copy email')) {
+            navigator.clipboard.writeText('noumankhanonai@gmail.com').then(()=>alert('Email copied'));
+            } else {
+            alert('Unknown command — try "help"');
+            }
+        }
+        })();
+    </script>
+
+
     <style>
         .retro{
         background:#000!important;
@@ -598,5 +680,122 @@
         layers.forEach((l,i)=>l.style.transform=`translateY(${-e.deltaY*(i+1)*0.2}px)`);
         });
     </script>
+
+    <script>
+        (() => {
+        const img = document.getElementById('profileImg');
+        if (!img) return;
+
+        img.addEventListener('mousemove', e => {
+            const rect = img.getBoundingClientRect();
+            const cx = rect.left + rect.width/2;
+            const cy = rect.top + rect.height/2;
+            const dx = (e.clientX - cx) / (rect.width/2); // -1..1
+            const dy = (e.clientY - cy) / (rect.height/2);
+            const rx = -dy * 8; // rotateX
+            const ry = dx * 10; // rotateY
+            img.style.transform = `perspective(600px) rotateX(${rx}deg) rotateY(${ry}deg) scale(1.02)`;
+            img.classList.add('tilted');
+        });
+        img.addEventListener('mouseleave', () => {
+            img.style.transform = '';
+            img.classList.remove('tilted');
+        });
+        })();
+    </script>
+
+    <!-- Add Smooth page transitions -->
+    <div id="page-overlay" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity .35s ease, transform .35s ease;z-index:9999;">
+        <div style="width:120px;height:120px;border-radius:16px;background:linear-gradient(135deg, rgba(239,68,68,0.12), rgba(239,68,68,0.06));backdrop-filter: blur(6px);display:flex;align-items:center;justify-content:center;transform:scale(.98);">
+            <div style="font-family:monospace;color:var(--red);font-weight:700;">Loading</div>
+        </div>
+    </div>
+
+    <script>
+        (() => {
+        const overlay = document.getElementById('page-overlay');
+        // Applies on anchor clicks that navigate away
+        document.addEventListener('click', (e) => {
+            const a = e.target.closest('a');
+            if (!a) return;
+            // ignore anchors that don't leave page or are # links or have target _blank
+            if (a.getAttribute('href')?.startsWith('#') || a.target === '_blank') return;
+            e.preventDefault();
+            overlay.style.pointerEvents = 'auto';
+            overlay.style.opacity = 1;
+            overlay.firstElementChild.style.transform = 'scale(1) translateY(0)';
+            // small delay for animation
+            setTimeout(() => { window.location = a.href; }, 380);
+        });
+        })();
+    </script>
+
+    <!-- Type-to-search links -->
+    <script>
+        (() => {
+        const cards = $$('.link-item');
+        if (!cards.length) return;
+        let buffer = '';
+        let timeout;
+        // show a small hint UI
+        const hint = document.createElement('div');
+        hint.style.cssText = 'position:fixed;bottom:14px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.6);color:white;padding:8px 12px;border-radius:999px;font-family:monospace;z-index:9999;opacity:0;transition:opacity .2s';
+        document.body.appendChild(hint);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            if (e.key.length === 1) {
+            buffer += e.key.toLowerCase();
+            hint.textContent = `Search: ${buffer}`;
+            hint.style.opacity = 1;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => { buffer = ''; hint.style.opacity = 0; clearHighlights(); }, 1200);
+            // highlight first matching card
+            const match = cards.find(c => c.textContent.toLowerCase().includes(buffer));
+            clearHighlights();
+            if (match) {
+                match.style.outline = '2px solid rgba(239,68,68,0.85)';
+                match.style.transform = 'translateY(-6px)';
+                match.scrollIntoView({behavior:'smooth', block:'center'});
+            }
+            } else if (e.key === 'Escape') {
+            buffer = '';
+            hint.style.opacity = 0;
+            clearHighlights();
+            } else if (e.key === 'Enter' && buffer) {
+            const match = cards.find(c => c.textContent.toLowerCase().includes(buffer));
+            if (match) match.click();
+            }
+        });
+
+        function clearHighlights() {
+            cards.forEach(c => { c.style.outline=''; c.style.transform=''; });
+        }
+        })();
+    </script>
+
+    <!-- Keyboard shortcuts -->
+    <script>
+        (() => {
+        const map = {
+            'g': 'https://github.com/iammuhammadnoumankhan',
+            'y': 'https://www.youtube.com/@NoumanKhanonAI',
+            'l': 'https://www.linkedin.com/in/muhammad-nouman-khan-248530233/',
+            'e': 'mailto:noumankhanonai@gmail.com'
+        };
+
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            // simple single-key shortcuts, ignoring Shift/Ctrl combos
+            const key = e.key.toLowerCase();
+            if (map[key]) {
+            // open in same tab; use _blank if you prefer new tab
+            window.open(map[key], '_self');
+            }
+        });
+        })();
+    </script>
+
+
 </body>
 </html>
