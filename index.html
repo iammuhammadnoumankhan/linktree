@@ -105,10 +105,10 @@
 </head>
 <body class="text-white">
     <!-- Background Animation -->
-    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+    <!-- <div class="fixed inset-0 overflow-hidden pointer-events-none">
         <div class="absolute -top-40 -right-40 w-80 h-80 bg-red-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
         <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-red-600 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse animation-delay-2000"></div>
-    </div>
+    </div> -->
 
     <!-- Main Container -->
     <div class="relative z-10 container mx-auto px-4 py-8 max-w-2xl">
@@ -255,6 +255,14 @@
         el.classList.add('animate-blur-up');
         });
 
+        /* ==== 3-D Tilt Cards ==== */
+        VanillaTilt.init($$('.link-item'), {
+        max: 7,          // max tilt in degrees
+        speed: 400,      // transition speed
+        glare: true,     // glare effect
+        'max-glare': .15
+        });
+
         /* ==== Magnetic Hover ==== */
         $$('.link-item').forEach((el) => {
         el.addEventListener('mousemove', (e) => {
@@ -263,12 +271,10 @@
             const y = (e.clientY - top - height / 2) / 15;
             el.style.transform = `translate(${x}px, ${y}px)`;
         });
-        el.addEventListener('mouseleave', () => {
-            el.style.transform = '';
-        });
+        el.addEventListener('mouseleave', () => { el.style.transform = ''; });
         });
 
-        /* ==== Ripple Effect ==== */
+        /* ==== Ripple Click ==== */
         $$('.link-item').forEach((btn) => {
         btn.addEventListener('click', (e) => {
             const span = document.createElement('span');
@@ -277,7 +283,7 @@
             span.className = 'ripple';
             span.style.width = span.style.height = size + 'px';
             span.style.left = e.clientX - rect.left - size / 2 + 'px';
-            span.style.top = e.clientY - rect.top - size / 2 + 'px';
+            span.style.top  = e.clientY - rect.top  - size / 2 + 'px';
             btn.appendChild(span);
             setTimeout(() => span.remove(), 600);
         });
@@ -289,7 +295,7 @@
         clock.className = 'fixed top-4 left-4 px-3 py-1 bg-black/30 backdrop-blur-sm rounded text-sm';
         document.body.appendChild(clock);
         setInterval(() => {
-        clock.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        clock.textContent = new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit', second:'2-digit' });
         }, 1000);
 
         /* ==== Auto-Typing Tagline ==== */
@@ -303,19 +309,10 @@
         function type() {
         if (forward) {
             tagEl.textContent = taglines[idx].slice(0, ++pos);
-            if (pos === taglines[idx].length) {
-            forward = false;
-            setTimeout(type, 1500);
-            return;
-            }
+            if (pos === taglines[idx].length) { forward = false; setTimeout(type, 1500); return; }
         } else {
             tagEl.textContent = taglines[idx].slice(0, --pos);
-            if (pos === 0) {
-            forward = true;
-            idx = (idx + 1) % taglines.length;
-            setTimeout(type, 300);
-            return;
-            }
+            if (pos === 0) { forward = true; idx = (idx + 1) % taglines.length; setTimeout(type, 300); return; }
         }
         setTimeout(type, 60);
         }
@@ -331,10 +328,34 @@
         setTimeout(() => note.remove(), 2000);
         };
 
-        /* ==== Respect User Motion Preference ==== */
+        /* ==== Particle Network Background ==== */
+        tsParticles.load("tsparticles", {
+        fpsLimit: 60,
+        particles: {
+            color: { value: "#ef4444" },
+            links: { color: "#ef4444", distance: 150, enable: true, opacity: 0.3, width: 1 },
+            move: { enable: true, speed: 1, direction: "none", outModes: "out" },
+            number: { value: 60 },
+            size: { value: { min: 1, max: 3 } }
+        },
+        interactivity: {
+            detectsOn: "canvas",
+            events: {
+            onHover: { enable: true, mode: "grab" },
+            onClick: { enable: true, mode: "push" }
+            }
+        }
+        });
+
+        /* ==== Respect Reduced Motion ==== */
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         $$('*').forEach((el) => el.style.animationDuration = '0.001ms');
         }
     </script>
+    <!-- 3-D Tilt -->
+    <script src="https://cdn.jsdelivr.net/npm/vanilla-tilt@1.7.0/dist/vanilla-tilt.min.js"></script>
+
+    <!-- Particle Network -->
+    <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.9.3/tsparticles.bundle.min.js"></script>
 </body>
 </html>
